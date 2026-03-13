@@ -23,6 +23,8 @@ print_stmt: "print" "(" expr ")"
 NAME: /[a-zA-Z_][a-zA-Z0-9_]*/
 NUMBER: /\d+/
 
+COMMENT: /#[^\n]*/
 %import common.WS
 %ignore WS
+%ignore COMMENT
 """
