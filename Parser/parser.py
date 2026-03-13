@@ -6,7 +6,7 @@ from lark import Lark, Transformer, v_args
 from grammar.grammar import grammar
 
 # 创建解析器
-parser = Lark(grammar, parser='lalr', debug=False)
+parser = Lark(grammar, start='start', parser='lalr', debug=False)
 
 def parse_code(code):
     """解析代码，返回 AST"""
@@ -26,12 +26,14 @@ class Interpreter(Transformer):
     
     @v_args(inline=True)
     def number(self, token):
-        """数字字面量 -> int"""
-        return int(token)
+        """数字字面量 -> float 或 int"""
+        val = token.value
+        return float(val) if '.' in val else int(val)
     
     @v_args(inline=True)
-    def var(self, name):
+    def var(self, token):
         """变量引用 -> 查表取值"""
+        name = token.value
         if name not in self.env:
             raise NameError(f"变量 '{name}' 未定义")
         return self.env[name]
@@ -49,12 +51,34 @@ class Interpreter(Transformer):
         return left * right
     
     @v_args(inline=True)
-    def div(self, left, right):
-        return left // right  # 整数除法
+    def bool(self, token):
+        """布尔字面量 -> bool"""
+        return token.value.lower() == 'true'
     
     @v_args(inline=True)
-    def assign(self, name, value):
+    def gt(self, left, right):
+        return left > right
+    
+    @v_args(inline=True)
+    def lt(self, left, right):
+        return left < right
+    
+    @v_args(inline=True)
+    def ge(self, left, right):
+        return left >= right
+    
+    @v_args(inline=True)
+    def le(self, left, right):
+        return left <= right
+    
+    @v_args(inline=True)
+    def eq(self, left, right):
+        return left == right
+    
+    @v_args(inline=True)
+    def assign(self, name_token, value):
         """赋值语句：存储变量"""
+        name = name_token.value
         self.env[name] = value
         return value
     

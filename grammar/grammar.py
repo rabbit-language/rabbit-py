@@ -2,15 +2,31 @@
 grammar = r"""
 ?start: stmt+
 
-stmt: assign | print_stmt
+stmt: var_decl 
+    | assign 
+    | print_stmt
+
+var_decl: NAME ":" type ("=" expr)?
+
+type: "Int" | "Float" | "String" | "Bool"
 
 assign: NAME "=" expr
 
 print_stmt: "print" "(" expr ")"
 
-?expr: term
-    | expr "+" term   -> add
-    | expr "-" term   -> sub
+// 表达式层级（从高到低优先级）
+?expr: compare
+
+?compare: add
+    | compare ">" add   -> gt
+    | compare "<" add   -> lt
+    | compare ">=" add  -> ge
+    | compare "<=" add  -> le
+    | compare "==" add  -> eq
+
+?add: term
+    | add "+" term   -> add
+    | add "-" term   -> sub
 
 ?term: factor
     | term "*" factor -> mul
@@ -18,10 +34,14 @@ print_stmt: "print" "(" expr ")"
 
 ?factor: NUMBER       -> number
        | NAME         -> var
+       | BOOL         -> bool
        | "(" expr ")"
 
-NAME: /[a-zA-Z_][a-zA-Z0-9_]*/
-NUMBER: /\d+/
+// 新增：布尔值关键字
+BOOL: "true" | "false"
+
+NAME: /[a-zA-Z_][a-zA-Z_0-9]*/
+NUMBER: /\d+(\.\d+)?/
 
 COMMENT: /#[^\n]*/
 %import common.WS
