@@ -1,28 +1,6 @@
-# 定义语法 - 支持赋值、表达式、print
-grammar = r"""
-?start: stmt+
+﻿# 语法定义入口文件。
+#
+# 将具体语法拆分到子模块（如 bool_grammar.py），方便后续扩展并保持模块清晰。
 
-stmt: assign | print_stmt
+from .bool_grammar import grammar
 
-assign: NAME "=" expr
-
-print_stmt: "print" "(" expr ")"
-
-?expr: term
-    | expr "+" term   -> add
-    | expr "-" term   -> sub
-
-?term: factor
-    | term "*" factor -> mul
-    | term "/" factor -> div
-
-?factor: NUMBER       -> number
-       | NAME         -> var
-       | "(" expr ")"
-
-NAME: /[a-zA-Z_][a-zA-Z0-9_]*/
-NUMBER: /\d+/
-
-%import common.WS
-%ignore WS
-"""

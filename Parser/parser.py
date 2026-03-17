@@ -1,9 +1,10 @@
 from lark import Lark, Transformer, v_args
 from ..grammar.grammar import grammar
+# from .. import grammar.grammar
 # from .. import test
 
-# 创建解析器
-parser = Lark(grammar, parser='lalr', debug=False)
+parser = Lark(grammar.grammar, parser='lalr', debug=False)
+# parser = Lark(grammar, parser='lalr', debug=False)
 
 # 解析
 

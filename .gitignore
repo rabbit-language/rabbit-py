@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.pyd
+
+# 忽略python相对导入问题.md
+*.md
