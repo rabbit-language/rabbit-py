@@ -1,18 +1,16 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
 from lark import Lark, Transformer, v_args
-from ..grammar.grammar import grammar
+from grammar.grammar import grammar
 # from .. import grammar.grammar
 # from .. import test
 
-parser = Lark(grammar.grammar, parser='lalr', debug=False)
+parser = Lark(grammar, parser='lalr', debug=False)
 # parser = Lark(grammar, parser='lalr', debug=False)
 
 # 解析
-
-"""test_code来自根文件test.py"""
-from ..test import test_code
-tree = parser.parse(test_code)
-print("AST 结构:")
-print(tree.pretty())
 
 class Interpreter(Transformer):
     """解释器：遍历 AST 并执行"""
@@ -67,3 +65,15 @@ class Interpreter(Transformer):
     def start(self, stmts):
         """程序入口：执行所有语句"""
         return stmts[-1] if stmts else None
+
+
+def parse_code(code):
+    """解析代码，返回AST"""
+    return parser.parse(code)
+
+
+def run_code(code):
+    """一步到位：解析并执行代码"""
+    tree = parse_code(code)
+    interpreter = Interpreter()
+    return interpreter.transform(tree)

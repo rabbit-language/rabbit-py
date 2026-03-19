@@ -1,7 +1,6 @@
 from Parser.parser import Interpreter, parse_code, run_code  # 导入函数，不要导入 tree
 
 test_code = """
-# Rabbit 语言测试
 a = 10
 b = 20
 print(a + b)
