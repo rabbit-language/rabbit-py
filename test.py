@@ -1,14 +1,13 @@
 from Parser.parser import Interpreter, parse_code, run_code  # 导入函数，不要导入 tree
 
-test_code = """
-a = 10
-b = 20
-print(a + b)
-"""
+# 尝试打开test/test.ribt文件
+with open("test/test.ribt", "r") as f:
+    test_code = f.read()
 
 if __name__ == "__main__":
     # 方法A：分步执行
     tree = parse_code(test_code)  # 先解析得到 tree
+    print(tree.pretty())  # 打印 tree 的结构
     interpreter = Interpreter()
     result = interpreter.transform(tree)  # 再执行
     print(f"执行结果: {result}")
