@@ -1,22 +1,16 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from lark import Lark, Transformer, v_args
 from grammar.grammar import grammar
+# from .. import grammar.grammar
+# from .. import test
 
-# 创建解析器
-parser = Lark(grammar, start='start', parser='lalr', debug=False)
+parser = Lark(grammar, parser='lalr', debug=False)
+# parser = Lark(grammar, parser='lalr', debug=False)
 
-def parse_code(code):
-    """解析代码，返回 AST"""
-    return parser.parse(code)
-
-def run_code(code):
-    """解析并执行代码，返回结果"""
-    tree = parse_code(code)
-    interpreter = Interpreter()
-    return interpreter.transform(tree)
+# 解析
 
 class Interpreter(Transformer):
     """解释器：遍历 AST 并执行"""
@@ -26,14 +20,12 @@ class Interpreter(Transformer):
     
     @v_args(inline=True)
     def number(self, token):
-        """数字字面量 -> float 或 int"""
-        val = token.value
-        return float(val) if '.' in val else int(val)
+        """数字字面量 -> int"""
+        return int(token)
     
     @v_args(inline=True)
-    def var(self, token):
+    def var(self, name):
         """变量引用 -> 查表取值"""
-        name = token.value
         if name not in self.env:
             raise NameError(f"变量 '{name}' 未定义")
         return self.env[name]
@@ -51,34 +43,12 @@ class Interpreter(Transformer):
         return left * right
     
     @v_args(inline=True)
-    def bool(self, token):
-        """布尔字面量 -> bool"""
-        return token.value.lower() == 'true'
+    def div(self, left, right):
+        return left // right  # 整数除法
     
     @v_args(inline=True)
-    def gt(self, left, right):
-        return left > right
-    
-    @v_args(inline=True)
-    def lt(self, left, right):
-        return left < right
-    
-    @v_args(inline=True)
-    def ge(self, left, right):
-        return left >= right
-    
-    @v_args(inline=True)
-    def le(self, left, right):
-        return left <= right
-    
-    @v_args(inline=True)
-    def eq(self, left, right):
-        return left == right
-    
-    @v_args(inline=True)
-    def assign(self, name_token, value):
+    def assign(self, name, value):
         """赋值语句：存储变量"""
-        name = name_token.value
         self.env[name] = value
         return value
     
@@ -95,3 +65,15 @@ class Interpreter(Transformer):
     def start(self, stmts):
         """程序入口：执行所有语句"""
         return stmts[-1] if stmts else None
+
+
+def parse_code(code):
+    """解析代码，返回AST"""
+    return parser.parse(code)
+
+
+def run_code(code):
+    """一步到位：解析并执行代码"""
+    tree = parse_code(code)
+    interpreter = Interpreter()
+    return interpreter.transform(tree)

@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyd
+
+# 忽略python相对导入问题.md
+*.md
+
+# 忽略.vscode文件夹
+.vscode/
